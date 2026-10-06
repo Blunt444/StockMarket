@@ -1,4 +1,4 @@
-package stockmarket
+package stockmarket;
 
 public class Data{
     public String name;

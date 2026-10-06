@@ -1,19 +1,19 @@
-package stockmarket
+package stockmarket;
 
-import picocli.CommandLine;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Command;
 
 @Command(name = "Price")
 public class Price implements Runnable{
 
-    @Parameters(index = '0')
+    @Parameters(index = "0")
     private String name; 
 
-    private final service = new PriceService();
+    private final DataService service = new DataService();
 
-    @override
+    @Override
     public void run(){
-        double price = service.getPrice(name);
+        Double price = service.getPrice(name);
 
         if(price == null){
             System.out.println("Unknown Stock Name");
