@@ -3,19 +3,21 @@ package stockmarket;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "portfolio", subcommands = {Portfolio.Add.class, Portfolio.Sell.class, Portfolio.Balance.class})
-public class Portfolio implements Runnable{
+import java.util.List;
+
+@Command(name = "portfolio", subcommands = { Portfolio.Add.class, Portfolio.Sell.class, Portfolio.Balance.class, Portfolio.Transaction.class})
+public class Portfolio implements Runnable {
 
     private static final DataService service = new DataService();
     private static final PortfolioData portfolioData = new PortfolioData();
 
     @Override
-    public void run(){
+    public void run() {
 
     }
 
     @Command(name = "add")
-    public static class Add implements Runnable{
+    public static class Add implements Runnable {
 
         @Parameters(index = "0")
         private String name;
@@ -23,13 +25,12 @@ public class Portfolio implements Runnable{
         private int quantity;
 
         @Override
-        public void run(){
-            boolean isUpdated = portfolioData.updateHoldings(name,quantity);
+        public void run() {
+            boolean isUpdated = portfolioData.updateHoldings(name, quantity);
 
-            if(isUpdated){
+            if (isUpdated) {
                 System.out.println("Successfully bought " + quantity + "shares of " + name);
-            }
-            else{
+            } else {
                 System.out.println("Failed to buy " + quantity + " shares of " + name);
             }
         }
@@ -37,33 +38,49 @@ public class Portfolio implements Runnable{
     }
 
     @Command(name = "sell")
-    public static class Sell implements Runnable{
+    public static class Sell implements Runnable {
         @Parameters(index = "0")
         private String name;
         @Parameters(index = "1")
         private int quantity;
 
         @Override
-        public void run(){
-            boolean isUpdated = portfolioData.updateHoldings(name,-quantity);
+        public void run() {
+            boolean isUpdated = portfolioData.updateHoldings(name, -quantity);
 
-            if(isUpdated){
+            if (isUpdated) {
                 System.out.println("Successfully sold " + quantity + "shares of " + name);
-            }
-            else{
+            } else {
                 System.out.println("Failed to sell " + quantity + " shares of " + name);
             }
         }
     }
 
     @Command(name = "balance")
-    public static class Balance implements Runnable{
+    public static class Balance implements Runnable {
 
-        @Override 
-        public void run(){
+        @Override
+        public void run() {
             double balance = portfolioData.getBalance();
 
             System.out.printf("Current Balance : $%.2f\n", balance);
+        }
+    }
+
+    @Command(name = "statement")
+    public static class Transaction implements Runnable {
+
+        @Parameters(index = "0")
+        private int amount;
+
+        @Override
+        public void run() {
+            List<Statement> statements = portfolioData.getStatements(amount);
+
+            for (Statement statement : statements) {
+                System.out.println((statement.transaction > 0 ? "Credited" : "Debited $") + statement.transaction
+                        + " for " + statement.quantity + " " + statement.stockName);
+            }
         }
     }
 
