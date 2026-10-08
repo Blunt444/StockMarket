@@ -5,7 +5,8 @@ import picocli.CommandLine.Parameters;
 
 import java.util.List;
 
-@Command(name = "portfolio", subcommands = { Portfolio.Add.class, Portfolio.Sell.class, Portfolio.Balance.class, Portfolio.Transaction.class})
+@Command(name = "portfolio", subcommands = { Portfolio.Add.class, Portfolio.Sell.class, Portfolio.Balance.class,
+        Portfolio.Transaction.class })
 public class Portfolio implements Runnable {
 
     private static final DataService service = new DataService();
@@ -29,7 +30,7 @@ public class Portfolio implements Runnable {
             boolean isUpdated = portfolioData.updateHoldings(name, quantity);
 
             if (isUpdated) {
-                System.out.println("Successfully bought " + quantity + "shares of " + name);
+                System.out.println("Successfully bought " + quantity + " shares of " + name);
             } else {
                 System.out.println("Failed to buy " + quantity + " shares of " + name);
             }
@@ -49,7 +50,7 @@ public class Portfolio implements Runnable {
             boolean isUpdated = portfolioData.updateHoldings(name, -quantity);
 
             if (isUpdated) {
-                System.out.println("Successfully sold " + quantity + "shares of " + name);
+                System.out.println("Successfully sold " + quantity + " shares of " + name);
             } else {
                 System.out.println("Failed to sell " + quantity + " shares of " + name);
             }
@@ -78,7 +79,10 @@ public class Portfolio implements Runnable {
             List<Statement> statements = portfolioData.getStatements(amount);
 
             for (Statement statement : statements) {
-                System.out.println((statement.transaction > 0 ? "Credited" : "Debited $") + statement.transaction
+                System.out.println((statement.transaction > 0 ? "Credited" : "Debited $") +
+                        (statement.transaction > 0
+                                ? statement.transaction
+                                : (statement.transaction * -1))
                         + " for " + statement.quantity + " " + statement.stockName);
             }
         }

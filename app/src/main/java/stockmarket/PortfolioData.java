@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class PortfolioData {
     private static Map<String, Integer> holdings = new HashMap<>();
-    private static double balance = 200;
+    private static double balance = 20000;
 
     private static final DataService service = new DataService();
     private static List<Statement> statements = new ArrayList<>();
@@ -52,9 +52,9 @@ public class PortfolioData {
     public List<Statement> getStatements(int amount){
         List<Statement> statement = new ArrayList<>();
 
-        int length = amount > statements.size() ? 0 : statement.size() - amount;  
+        int length = amount >= statements.size() ? 0 : statements.size() - amount;  
 
-        for(int i = statements.size() - 1; i >= length ; i++){
+        for(int i = statements.size() - 1; i >= length ; i--){
             statement.add(statements.get(i));
         }
 
