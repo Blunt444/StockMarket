@@ -3,7 +3,7 @@ package stockmarket;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "portfolio", subcommands = {Portfolio.Add.class, Portfolio.Sell.class})
+@Command(name = "portfolio", subcommands = {Portfolio.Add.class, Portfolio.Sell.class, Portfolio.Balance.class})
 public class Portfolio implements Runnable{
 
     private static final DataService service = new DataService();
@@ -30,7 +30,7 @@ public class Portfolio implements Runnable{
                 System.out.println("Successfully bought " + quantity + "shares of " + name);
             }
             else{
-                System.out.println("Failed to buy " + quantity + "shares of" + name);
+                System.out.println("Failed to buy " + quantity + " shares of " + name);
             }
         }
 
@@ -51,8 +51,19 @@ public class Portfolio implements Runnable{
                 System.out.println("Successfully sold " + quantity + "shares of " + name);
             }
             else{
-                System.out.println("Failed to sell " + quantity + "shares of" + name);
+                System.out.println("Failed to sell " + quantity + " shares of " + name);
             }
+        }
+    }
+
+    @Command(name = "balance")
+    public static class Balance implements Runnable{
+
+        @Override 
+        public void run(){
+            double balance = portfolioData.getBalance();
+
+            System.out.printf("Current Balance : $%.2f\n", balance);
         }
     }
 
