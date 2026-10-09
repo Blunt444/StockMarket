@@ -5,7 +5,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.List;
 
-@Command(name = "portfolio", subcommands = { Portfolio.Add.class, Portfolio.Sell.class, Portfolio.Balance.class,
+@Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
         Portfolio.Transaction.class })
 public class Portfolio implements Runnable {
 
@@ -17,8 +17,8 @@ public class Portfolio implements Runnable {
 
     }
 
-    @Command(name = "add")
-    public static class Add implements Runnable {
+    @Command(name = "buy")
+    public static class Buy implements Runnable {
 
         @Parameters(index = "0")
         private String name;
@@ -78,12 +78,32 @@ public class Portfolio implements Runnable {
         public void run() {
             List<Statement> statements = portfolioData.getStatements(amount);
 
+            if (statements.size() == 0) {
+                System.out.println("No transaction of any TYPE");
+                return;
+            }
+
             for (Statement statement : statements) {
-                System.out.println((statement.transaction > 0 ? "Credited" : "Debited $") +
-                        (statement.transaction > 0
-                                ? statement.transaction
-                                : (statement.transaction * -1))
-                        + " for " + statement.quantity + " " + statement.stockName);
+                // System.out.println((statement.transaction > 0 ? "Credited" : "Debited $") +
+                // (statement.transaction > 0
+                // ? statement.transaction
+                // : (statement.transaction * -1))
+                // + " for " + statement.quantity + " " + statement.stockName);
+
+                if (statement.type == StatementType.BUY) {
+                    System.out.println("Bought " + statement.quantity + " quantity of " + statement.stockName + " for $"
+                            + statement.transaction * -1);
+                } else if (statement.type == StatementType.SELL) {
+                    System.out.println("SOLD " + statement.quantity + " quantity of " + statement.stockName + " for $"
+                            + statement.transaction);
+                } else if (statement.type == StatementType.WITHDRAW) {
+                    System.out.println("Withdrew $" + statement.transaction);
+                } else if (statement.type == StatementType.DEPOSIT) {
+                    System.out.println("Deposited $" + statement.transaction);
+                } else {
+                    System.out.println("Error in statement");
+                }
+
             }
         }
     }

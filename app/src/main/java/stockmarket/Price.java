@@ -3,7 +3,7 @@ package stockmarket;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Command;
 
-@Command(name = "Price")
+@Command(name = "price")
 public class Price implements Runnable{
 
     @Parameters(index = "0")
@@ -20,6 +20,6 @@ public class Price implements Runnable{
             return;
         }
         
-        System.out.printf("%.2f", price);
+        System.out.printf("%.2f\n", price);
     } 
 }

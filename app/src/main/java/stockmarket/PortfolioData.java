@@ -27,7 +27,7 @@ public class PortfolioData {
 
             holdings.put(name, holdings.getOrDefault(name, 0) + quantity);
             balance -= price * quantity;
-            addStatement(quantity, -price * quantity, name);
+            addStatement(quantity, -price * quantity, name, StatementType.BUY);
             return true;
         }
 
@@ -36,7 +36,7 @@ public class PortfolioData {
 
         holdings.put(name, holdings.get(name) - (-quantity));
         balance += price * quantity;
-        addStatement(quantity, price * quantity, name);
+        addStatement(-quantity, price * -quantity, name, StatementType.SELL);
         return true;
     }
 
@@ -44,20 +44,25 @@ public class PortfolioData {
         return balance;
     }
 
-    public void addStatement(int quantity, double transaction, String stockName) {
-        Statement statement = new Statement(quantity, transaction, stockName);
+    public void addStatement(int quantity, double transaction, String stockName, StatementType type) {
+        Statement statement = new Statement(quantity, transaction, stockName, type);
         statements.add(statement);
     }
 
-    public List<Statement> getStatements(int amount){
+    public void addStatement(double transaction, StatementType type) {
+        Statement statement = new Statement(transaction, type);
+        statements.add(statement);
+    }
+
+    public List<Statement> getStatements(int amount) {
         List<Statement> statement = new ArrayList<>();
 
-        int length = amount >= statements.size() ? 0 : statements.size() - amount;  
+        int length = amount >= statements.size() ? 0 : statements.size() - amount;
 
-        for(int i = statements.size() - 1; i >= length ; i--){
+        for (int i = statements.size() - 1; i >= length; i--) {
             statement.add(statements.get(i));
         }
 
-        return  statement;
+        return statement;
     }
 }
