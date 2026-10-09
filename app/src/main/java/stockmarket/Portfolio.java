@@ -4,6 +4,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.util.List;
+import java.util.Scanner;
 
 @Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
         Portfolio.Transaction.class })
@@ -27,7 +28,19 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
-            String message = portfolioData.updateHoldings(name, quantity);
+
+            System.out.print("Do you want to proceed this action(Y/N): ");
+
+            String confirmation = App.sc.nextLine().trim().toLowerCase();
+
+            System.out.print("\n");
+
+            if (confirmation.equals("y")) {
+                String message = portfolioData.updateHoldings(name, quantity);
+                System.out.println(message);
+            } else {
+                System.out.println("Cancelled the action.");
+            }
 
             // if (isUpdated) {
             // System.out.println("Successfully bought " + quantity + " shares of " + name);
@@ -35,7 +48,6 @@ public class Portfolio implements Runnable {
             // System.out.println("Failed to buy " + quantity + " shares of " + name);
             // }
 
-            System.out.println(message);
         }
 
     }
@@ -49,15 +61,25 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
-            String message = portfolioData.updateHoldings(name, -quantity);
 
+            System.out.print("Do you want to proceed this action(Y/N): ");
+
+            String confirmation = App.sc.nextLine().trim().toLowerCase();
+
+            System.out.print("\n");
+
+            if (confirmation.toLowerCase().equals("y")) {
+                String message = portfolioData.updateHoldings(name, -quantity);
+                System.out.println(message);
+            } else {
+                System.out.println("Cancelled the action.");
+            }
             // if (isUpdated) {
             // System.out.println("Successfully sold " + quantity + " shares of " + name);
             // } else {
             // System.out.println("Failed to sell " + quantity + " shares of " + name);
             // }
 
-            System.out.println(message);
         }
     }
 
