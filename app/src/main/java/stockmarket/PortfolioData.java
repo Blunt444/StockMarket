@@ -12,32 +12,34 @@ public class PortfolioData {
     private static final DataService service = new DataService();
     private static List<Statement> statements = new ArrayList<>();
 
-    public boolean updateHoldings(String name, int quantity) {
+    public String updateHoldings(String name, int quantity) {
         if (quantity == 0)
-            return true;
+            return "0 Quantity really bruh...";
 
         Double price = service.getPrice(name);
         if (price == null)
-            return false;
+            return "Oops service couldn't find the price for the stock: " + name;
 
         if (quantity > 0) {
 
             if (price * quantity > balance)
-                return false;
+                return "Insufficient Balance.";
 
             holdings.put(name, holdings.getOrDefault(name, 0) + quantity);
             balance -= price * quantity;
             addStatement(quantity, -price * quantity, name, StatementType.BUY);
-            return true;
+            return "Successfully bought " + quantity + " shares of " + name;
         }
 
-        if (!holdings.containsKey(name) || holdings.get(name) < -quantity)
-            return false;
+        if (!holdings.containsKey(name))
+            return "Seems like " + name + "is not in your holdings";
+        else if (holdings.get(name) < -quantity)
+            return "Quantity is greater than what you hold. " + "Actual: " + holdings.get(name) + " Selling: " + -quantity;
 
         holdings.put(name, holdings.get(name) - (-quantity));
         balance += price * quantity;
         addStatement(-quantity, price * -quantity, name, StatementType.SELL);
-        return true;
+        return "Successfully sold " + -quantity + " shares of " + name;
     }
 
     public double getBalance() {

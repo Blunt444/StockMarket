@@ -27,13 +27,15 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
-            boolean isUpdated = portfolioData.updateHoldings(name, quantity);
+            String message = portfolioData.updateHoldings(name, quantity);
 
-            if (isUpdated) {
-                System.out.println("Successfully bought " + quantity + " shares of " + name);
-            } else {
-                System.out.println("Failed to buy " + quantity + " shares of " + name);
-            }
+            // if (isUpdated) {
+            // System.out.println("Successfully bought " + quantity + " shares of " + name);
+            // } else {
+            // System.out.println("Failed to buy " + quantity + " shares of " + name);
+            // }
+
+            System.out.println(message);
         }
 
     }
@@ -47,13 +49,15 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
-            boolean isUpdated = portfolioData.updateHoldings(name, -quantity);
+            String message = portfolioData.updateHoldings(name, -quantity);
 
-            if (isUpdated) {
-                System.out.println("Successfully sold " + quantity + " shares of " + name);
-            } else {
-                System.out.println("Failed to sell " + quantity + " shares of " + name);
-            }
+            // if (isUpdated) {
+            // System.out.println("Successfully sold " + quantity + " shares of " + name);
+            // } else {
+            // System.out.println("Failed to sell " + quantity + " shares of " + name);
+            // }
+
+            System.out.println(message);
         }
     }
 
@@ -71,7 +75,7 @@ public class Portfolio implements Runnable {
     @Command(name = "statement")
     public static class Transaction implements Runnable {
 
-        @Parameters(index = "0")
+        @Parameters(index = "0", arity = "0..1", defaultValue = "10")
         private int amount;
 
         @Override
