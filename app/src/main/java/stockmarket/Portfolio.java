@@ -4,10 +4,9 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.util.List;
-import java.util.Scanner;
 
 @Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
-        Portfolio.Transaction.class })
+        Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class })
 public class Portfolio implements Runnable {
 
     private static final DataService service = new DataService();
@@ -130,6 +129,53 @@ public class Portfolio implements Runnable {
                     System.out.println("Error in statement");
                 }
 
+            }
+        }
+    }
+
+    @Command(name = "list")
+    public static class ListHolding implements Runnable {
+        @Parameters(index = "0", arity = "0..1", defaultValue = "10")
+        private int amount;
+
+        @Override
+        public void run() {
+
+        }
+    }
+
+    @Command(name = "deposit")
+    public static class Deposit implements Runnable {
+
+        @Parameters(index = "0")
+        private double amount;
+
+        @Override
+        public void run() {
+            boolean confirmation = portfolioData.deposit(amount);
+
+            if (confirmation) {
+                System.out.println("Successfully deposited $" + amount);
+            } else {
+                System.out.println("Failed to deposit $" + amount);
+            }
+        }
+    }
+
+    @Command(name = "withdraw")
+    public static class Withdraw implements Runnable {
+        @Parameters(index = "0")
+        private double amount;
+
+        @Override
+        public void run(){
+            boolean confirmation = portfolioData.withdraw(amount);
+
+            if(confirmation){
+                System.out.println("Successfully withdrew $" + amount + " Current Balance: " + portfolioData.getBalance());
+            }
+            else{
+                System.out.println("Failed to withdraw. Reason Insufficient Balance. Current Balance: " + portfolioData.getBalance());
             }
         }
     }

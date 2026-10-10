@@ -5,7 +5,7 @@ import picocli.CommandLine.Command;
 
 import java.util.Scanner;
 
-@Command(name = "stock", description = "A stock market CLI", subcommands = { Price.class, Portfolio.class })
+@Command(name = "stockmarket", description = "A stock market CLI", subcommands = { Price.class, Portfolio.class })
 public class App implements Runnable {
     static final Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
@@ -23,7 +23,7 @@ public class App implements Runnable {
         while (true) {
             System.out.print("StockMarket> ");
 
-            String line = sc.nextLine().trim();
+            String line = sc.nextLine().trim().toLowerCase();
 
             if (line.isEmpty())
                 continue;
