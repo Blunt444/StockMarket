@@ -4,6 +4,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.util.List;
+import java.util.Map;
 
 @Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
         Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class })
@@ -117,7 +118,7 @@ public class Portfolio implements Runnable {
 
                 if (statement.type == StatementType.BUY) {
                     System.out.println("Bought " + statement.quantity + " quantity of " + statement.stockName + " for $"
-                            + statement.transaction * -1);
+                            + statement.transaction);
                 } else if (statement.type == StatementType.SELL) {
                     System.out.println("SOLD " + statement.quantity + " quantity of " + statement.stockName + " for $"
                             + statement.transaction);
@@ -140,7 +141,50 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
+            List<Map.Entry<String, Holding>> all = portfolioData.getHoldings(amount);
+            int offset = 0;
 
+            boolean again = false;
+
+            do {
+
+                int len = Math.min(amount + offset, all.size());
+
+                for(int i = offset; i < len; i++){
+                    String stockName = all.get(i).getKey();
+                    Holding holding = all.get(i).getValue();
+
+                    System.out.println("Stock: " + stockName + " ,Quantity: " + holding.quantity + " ,Bought Price: $" + holding.boughtPrice + 
+                    " ,Current Pice: $" + service.getPrice(stockName) + " ,Diff: $" + (service.getPrice(stockName) - holding.boughtPrice));
+                }
+
+                offset += len;
+
+                if(offset >= all.size()){
+                    System.out.println("All Holdings are listed...");
+                    break;
+                }
+
+                System.out.print("Do you want to list more stocks(y/n) ");
+                String confirmation = App.sc.next().trim().toLowerCase();
+                System.out.println();
+
+                if(confirmation.equals("yes") || confirmation.equals("y")){
+                    again = true;
+                    System.out.print("How many more? ");
+                    amount = App.sc.nextInt();
+
+                    if(amount < 0){
+                        System.out.println("Not a valid input. Must be greater than 0.");
+                        break;
+                    }
+                }
+                else{
+                    System.out.println("Quiting the listing...");
+                    break;
+                }
+
+            } while (again);
         }
     }
 
@@ -168,16 +212,16 @@ public class Portfolio implements Runnable {
         private double amount;
 
         @Override
-        public void run(){
+        public void run() {
             boolean confirmation = portfolioData.withdraw(amount);
 
-            if(confirmation){
-                System.out.println("Successfully withdrew $" + amount + " Current Balance: " + portfolioData.getBalance());
-            }
-            else{
-                System.out.println("Failed to withdraw. Reason Insufficient Balance. Current Balance: " + portfolioData.getBalance());
+            if (confirmation) {
+                System.out.println(
+                        "Successfully withdrew $" + amount + " Current Balance: " + portfolioData.getBalance());
+            } else {
+                System.out.println("Failed to withdraw. Reason: Insufficient Balance. Current Balance: "
+                        + portfolioData.getBalance());
             }
         }
     }
-
 }
