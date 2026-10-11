@@ -134,6 +134,32 @@ public class Portfolio implements Runnable {
         }
     }
 
+    @Command(name = "trade")
+    public static class Trade implements Runnable {
+
+        @Parameters(index = "0", arity = "0..1", defaultValue = "10")
+        private int amount;
+
+        @Override
+        public void run() {
+            int offset = 0;
+            List<Statement> all = portfolioData.getTrade(amount);
+            boolean again = false;
+
+            do {
+
+                int len = Math.min(offset + amount, all.size());
+
+                for(int i = offset; i < len; i++){
+                    Statement statement = all.get(i);
+
+                    System.out.println("Stock Name: " + statement.stockName);
+                }
+
+            } while (again);
+        }
+    }
+
     @Command(name = "list")
     public static class ListHolding implements Runnable {
         @Parameters(index = "0", arity = "0..1", defaultValue = "10")
@@ -150,17 +176,19 @@ public class Portfolio implements Runnable {
 
                 int len = Math.min(amount + offset, all.size());
 
-                for(int i = offset; i < len; i++){
+                for (int i = offset; i < len; i++) {
                     String stockName = all.get(i).getKey();
                     Holding holding = all.get(i).getValue();
 
-                    System.out.println("Stock: " + stockName + " ,Quantity: " + holding.quantity + " ,Bought Price: $" + holding.boughtPrice + 
-                    " ,Current Pice: $" + service.getPrice(stockName) + " ,Diff: $" + (service.getPrice(stockName) - holding.boughtPrice));
+                    System.out.println("Stock: " + stockName + " ,Quantity: " + holding.quantity + " ,Bought Price: $"
+                            + holding.boughtPrice +
+                            " ,Current Pice: $" + service.getPrice(stockName) + " ,Diff: $"
+                            + (service.getPrice(stockName) - holding.boughtPrice));
                 }
 
                 offset = len;
 
-                if(offset >= all.size()){
+                if (offset >= all.size()) {
                     System.out.println("All Holdings are listed...");
                     break;
                 }
@@ -169,17 +197,16 @@ public class Portfolio implements Runnable {
                 String confirmation = App.sc.nextLine().trim().toLowerCase();
                 System.out.println();
 
-                if(confirmation.equals("yes") || confirmation.equals("y")){
+                if (confirmation.equals("yes") || confirmation.equals("y")) {
                     again = true;
                     System.out.print("How many more? ");
                     amount = App.sc.nextInt();
 
-                    if(amount < 0){
+                    if (amount < 0) {
                         System.out.println("Not a valid input. Must be greater than 0.");
                         break;
                     }
-                }
-                else{
+                } else {
                     System.out.println("Quiting the listing...");
                     break;
                 }

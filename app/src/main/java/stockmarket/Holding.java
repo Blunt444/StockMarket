@@ -2,13 +2,16 @@ package stockmarket;
 
 public class Holding {
     public int quantity;
-    public double boughtPrice;
+    public double amount;
+    public double pricePerShare;
 
-    Holding(int quantity, double boughtPrice) {
+    Holding(int quantity, double amount, double pricePerShare) {
         this.quantity = quantity;
-        this.boughtPrice = boughtPrice;
+        this.amount = amount;
+        this.pricePerShare = pricePerShare;
     }
-    Holding(){
-        
+
+    Holding() {
+
     }
 }

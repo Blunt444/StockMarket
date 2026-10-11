@@ -29,37 +29,45 @@ public class PortfolioData {
 
         if (quantity > 0) {
 
-            if (price * quantity > balance)
+            double total = price * quantity;
+            Holding holding = holdings.get(name);
+
+            if (total > balance)
                 return "Insufficient Balance.";
 
-            Holding holding;
-            if (holdings.containsKey(name)) {
-                holding = holdings.get(name);
+            if (holding != null) {
                 holding.quantity += quantity;
+                holding.amount += total;
+                holding.pricePerShare = (holding.amount) / (holding.quantity);
+
             } else {
-                holding = new Holding(quantity, price);
+                holding = new Holding(quantity, total, price);
                 holdings.put(name, holding);
             }
 
-            balance -= price * quantity;
-            addStatement(quantity, price * quantity, name, StatementType.BUY);
+            balance -= total;
+            addStatement(quantity, total, name, StatementType.BUY, price);
             return "Successfully bought " + quantity + " shares of " + name;
         }
 
-        if (!holdings.containsKey(name))
+        Holding holding = holdings.get(name);
+        double total = price * -quantity;
+
+        if (holding == null)
             return "Seems like " + name + " is not in your holdings";
-        else if (holdings.get(name).quantity < -quantity)
-            return "Quantity is greater than what you hold. " + "Actual: " + holdings.get(name) + " Selling: "
+        else if (holding.quantity < -quantity)
+            return "Quantity is greater than what you hold. " + "Actual: " + holding.quantity + " Selling: "
                     + -quantity;
 
-        Holding holding = holdings.get(name);
         holding.quantity += quantity;
+        holding.amount += holding.pricePerShare * quantity;
 
         if (holding.quantity == 0)
             holdings.remove(name);
 
-        balance += price * -quantity;
-        addStatement(-quantity, price * -quantity, name, StatementType.SELL);
+
+        balance += total;
+        addStatement(-quantity, total, name, StatementType.SELL, price);
         return "Successfully sold " + -quantity + " shares of " + name;
     }
 
@@ -67,8 +75,9 @@ public class PortfolioData {
         return balance;
     }
 
-    public void addStatement(int quantity, double transaction, String stockName, StatementType type) {
-        Statement statement = new Statement(quantity, transaction, stockName, type);
+    public void addStatement(int quantity, double transaction, String stockName, StatementType type,
+            double pricePerShare) {
+        Statement statement = new Statement(quantity, transaction, stockName, type, pricePerShare);
         statements.add(statement);
     }
 
@@ -89,9 +98,22 @@ public class PortfolioData {
         return statement;
     }
 
+    public List<Statement> getTrade(int amount) {
+        List<Statement> result = new ArrayList<>();
+
+        for (int i = statements.size() - 1; i >= 0; i--) {
+            Statement statement = statements.get(i);
+            if (statement.type == StatementType.BUY || statement.type == StatementType.SELL) {
+                result.add(statement);
+            }
+        }
+
+        return result;
+    }
+
     public boolean deposit(double amount) {
         balance += amount;
-
+        addStatement(amount, StatementType.DEPOSIT);
         return true;
     }
 
@@ -100,6 +122,7 @@ public class PortfolioData {
             return false;
 
         balance -= amount;
+        addStatement(amount, StatementType.WITHDRAW);
 
         return true;
     }
