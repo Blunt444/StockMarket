@@ -142,8 +142,17 @@ public class Portfolio implements Runnable {
         @Override
         public void run() {
             int offset = 0;
-            List<Statement> all = portfolioData.getTrade(amount);
+            List<Statement> all = portfolioData.getTrade();
             boolean again = false;
+
+            if(amount <= 0){
+                System.out.println("Amount must be greater than 0.");
+                return;
+            }
+            if(all.size() == 0){
+                System.out.println("You have no Trade yet.");
+                return;
+            }
 
             do {
 
@@ -233,6 +242,12 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
+
+            if(amount <= 0){
+                System.out.println("Amount must be greater than 0.");
+                return;
+            }
+
             boolean confirmation = portfolioData.deposit(amount);
 
             if (confirmation) {
@@ -250,6 +265,12 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
+
+            if(amount <= 0){
+                System.out.println("Amount must be greater than 0.");
+                return;
+            }
+
             boolean confirmation = portfolioData.withdraw(amount);
 
             if (confirmation) {

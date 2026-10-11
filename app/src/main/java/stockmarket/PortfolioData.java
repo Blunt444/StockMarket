@@ -98,7 +98,7 @@ public class PortfolioData {
         return statement;
     }
 
-    public List<Statement> getTrade(int amount) {
+    public List<Statement> getTrade() {
         List<Statement> result = new ArrayList<>();
 
         for (int i = statements.size() - 1; i >= 0; i--) {
