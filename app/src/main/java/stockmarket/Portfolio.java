@@ -118,14 +118,14 @@ public class Portfolio implements Runnable {
 
                 if (statement.type == StatementType.BUY) {
                     System.out.println("Bought " + statement.quantity + " quantity of " + statement.stockName + " for $"
-                            + statement.transaction);
+                            + statement.transaction + " Price Per Share You Bought: $" + statement.pricePerShare + " at " + statement.time);
                 } else if (statement.type == StatementType.SELL) {
                     System.out.println("SOLD " + statement.quantity + " quantity of " + statement.stockName + " for $"
-                            + statement.transaction);
+                            + statement.transaction + " Price Per Share You Sold: $" + statement.pricePerShare + " at " + statement.time);
                 } else if (statement.type == StatementType.WITHDRAW) {
-                    System.out.println("Withdrew $" + statement.transaction);
+                    System.out.println("Withdrew $" + statement.transaction + " at " + statement.time);
                 } else if (statement.type == StatementType.DEPOSIT) {
-                    System.out.println("Deposited $" + statement.transaction);
+                    System.out.println("Deposited $" + statement.transaction + " at " + statement.time);
                 } else {
                     System.out.println("Error in statement");
                 }
@@ -181,9 +181,9 @@ public class Portfolio implements Runnable {
                     Holding holding = all.get(i).getValue();
 
                     System.out.println("Stock: " + stockName + " ,Quantity: " + holding.quantity + " ,Bought Price: $"
-                            + holding.boughtPrice +
+                            + holding.amount +
                             " ,Current Pice: $" + service.getPrice(stockName) + " ,Diff: $"
-                            + (service.getPrice(stockName) - holding.boughtPrice));
+                            + (service.getPrice(stockName) - holding.pricePerShare) + " ,Price Per Share on your Holding: $" + holding.pricePerShare);
                 }
 
                 offset = len;
