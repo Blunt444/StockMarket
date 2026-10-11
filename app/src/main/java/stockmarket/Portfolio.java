@@ -102,6 +102,10 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
+            if(amount <= 0){
+                System.out.println("Amount must be more than 0.");
+                return;
+            }
             List<Statement> statements = portfolioData.getStatements(amount);
 
             if (statements.size() == 0) {
@@ -110,11 +114,6 @@ public class Portfolio implements Runnable {
             }
 
             for (Statement statement : statements) {
-                // System.out.println((statement.transaction > 0 ? "Credited" : "Debited $") +
-                // (statement.transaction > 0
-                // ? statement.transaction
-                // : (statement.transaction * -1))
-                // + " for " + statement.quantity + " " + statement.stockName);
 
                 if (statement.type == StatementType.BUY) {
                     System.out.println("Bought " + statement.quantity + " quantity of " + statement.stockName + " for $"
@@ -167,10 +166,18 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
-            List<Map.Entry<String, Holding>> all = portfolioData.getHoldings(amount);
+            List<Map.Entry<String, Holding>> all = portfolioData.getHoldings();
             int offset = 0;
-
             boolean again = false;
+
+            if(amount <= 0){
+                System.out.println("Amount must be greater than 0.");
+                return;
+            }
+            if(all.size() == 0){
+                System.out.println("You have no holdings yet.");
+                return;
+            }
 
             do {
 
@@ -180,10 +187,13 @@ public class Portfolio implements Runnable {
                     String stockName = all.get(i).getKey();
                     Holding holding = all.get(i).getValue();
 
-                    System.out.println("Stock: " + stockName + " ,Quantity: " + holding.quantity + " ,Bought Price: $"
-                            + holding.amount +
-                            " ,Current Pice: $" + service.getPrice(stockName) + " ,Diff: $"
-                            + (service.getPrice(stockName) - holding.pricePerShare) + " ,Price Per Share on your Holding: $" + holding.pricePerShare);
+                    System.out.println("Stock: " + stockName + 
+                            " ,Quantity: " + holding.quantity +
+                            " ,Total Invested: $" + holding.amount +
+                            " ,Avg Buy Price: $" + holding.pricePerShare + 
+                            " ,Current Pice: $" + service.getPrice(stockName) + 
+                            " ,Diff: $" + (service.getPrice(stockName) - holding.pricePerShare)
+                        );
                 }
 
                 offset = len;
@@ -202,7 +212,7 @@ public class Portfolio implements Runnable {
                     System.out.print("How many more? ");
                     amount = App.sc.nextInt();
 
-                    if (amount < 0) {
+                    if (amount <= 0) {
                         System.out.println("Not a valid input. Must be greater than 0.");
                         break;
                     }

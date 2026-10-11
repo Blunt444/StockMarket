@@ -12,7 +12,7 @@ public class PortfolioData {
     private static final DataService service = new DataService();
     private static List<Statement> statements = new ArrayList<>();
 
-    public List<Map.Entry<String, Holding>> getHoldings(int amount) {
+    public List<Map.Entry<String, Holding>> getHoldings() {
 
         List<Map.Entry<String, Holding>> all = new ArrayList<>(holdings.entrySet());
 
