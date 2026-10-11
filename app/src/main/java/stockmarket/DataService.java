@@ -16,4 +16,11 @@
 
             return val.price;
         }
+
+        public Data getDetail(String stockName){
+            if(data.containsKey(stockName)){
+                return data.get(stockName);
+            }
+            return null;
+        }
     }

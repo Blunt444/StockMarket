@@ -5,7 +5,7 @@ import picocli.CommandLine.Command;
 
 import java.util.Scanner;
 
-@Command(name = "stockmarket", description = "A stock market CLI", subcommands = { Price.class, Portfolio.class })
+@Command(name = "stockmarket", description = "A stock market CLI", subcommands = { Price.class, Portfolio.class, Stock.class })
 public class App implements Runnable {
     static final Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
