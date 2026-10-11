@@ -158,7 +158,7 @@ public class Portfolio implements Runnable {
                     " ,Current Pice: $" + service.getPrice(stockName) + " ,Diff: $" + (service.getPrice(stockName) - holding.boughtPrice));
                 }
 
-                offset += len;
+                offset = len;
 
                 if(offset >= all.size()){
                     System.out.println("All Holdings are listed...");
@@ -166,7 +166,7 @@ public class Portfolio implements Runnable {
                 }
 
                 System.out.print("Do you want to list more stocks(y/n) ");
-                String confirmation = App.sc.next().trim().toLowerCase();
+                String confirmation = App.sc.nextLine().trim().toLowerCase();
                 System.out.println();
 
                 if(confirmation.equals("yes") || confirmation.equals("y")){
