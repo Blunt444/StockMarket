@@ -3,11 +3,12 @@ package stockmarket;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 
 @Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
-        Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class, 
+        Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class,
         Portfolio.Trade.class })
 public class Portfolio implements Runnable {
 
@@ -29,7 +30,6 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
-
             System.out.print("Do you want to proceed this action(Y/N): ");
 
             String confirmation = App.sc.nextLine().trim().toLowerCase();
@@ -164,12 +164,14 @@ public class Portfolio implements Runnable {
                 for (int i = offset; i < len; i++) {
                     Statement statement = all.get(i);
 
-                    System.out.println("Stock Name: " + statement.stockName.toUpperCase() + " ,Type: " + statement.type + " , Amount: $" + 
-                    statement.transaction + " ,Quantity: " + statement.quantity + " ,Price: $" + statement.pricePerShare + " at " + statement.time);
+                    System.out.println("Stock Name: " + statement.stockName.toUpperCase() + " ,Type: " + statement.type
+                            + " , Total: $" +
+                            statement.transaction + " ,Quantity: " + statement.quantity + " ,Price: $"
+                            + statement.pricePerShare + " at " + statement.time);
                 }
 
                 offset = len;
-                if(offset >= all.size()){
+                if (offset >= all.size()) {
                     System.out.println("All trades have been listed.");
                     break;
                 }
@@ -180,17 +182,23 @@ public class Portfolio implements Runnable {
                 if (confirmation.equals("y") || confirmation.equals("yes")) {
                     again = true;
                     System.out.print("How many more? ");
-                    amount = App.sc.nextInt();
 
-                    if (amount <= 0) {
-                        System.out.println("Amount must be greater than 0.");
+                    try {
+                        amount = App.sc.nextInt();
+                        App.sc.nextLine();
+                        if (amount <= 0) {
+                            System.out.println("Amount must be greater than 0.");
+                            break;
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println("Invalid Input. Quiting Listing");
                         break;
                     }
+
                 } else {
                     System.out.println("Quiting Listing...");
                     break;
                 }
-
 
             } while (again);
         }
@@ -246,10 +254,16 @@ public class Portfolio implements Runnable {
                 if (confirmation.equals("yes") || confirmation.equals("y")) {
                     again = true;
                     System.out.print("How many more? ");
-                    amount = App.sc.nextInt();
 
-                    if (amount <= 0) {
-                        System.out.println("Not a valid input. Must be greater than 0.");
+                    try {
+                        amount = App.sc.nextInt();
+                        App.sc.nextLine();
+                        if (amount <= 0) {
+                            System.out.println("Not a valid input. Must be greater than 0.");
+                            break;
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println("Invalid Input. Quiting Listing.");
                         break;
                     }
                 } else {
