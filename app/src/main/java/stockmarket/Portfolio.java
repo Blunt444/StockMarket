@@ -324,25 +324,33 @@ public class Portfolio implements Runnable {
         }
     }
 
-    @Command(name = "fav")
-    public static class Favorite implements Runnable {
-        @Parameters(index = "0")
-        String type;
-        @Parameters(index = "1")
-        String stockName;
+    @Command(name = "fav", subcommands = { Favorite.Add.class, Favorite.Remove.class})
+    public static class Favorite {
 
-        @Override
-        public void run() {
-            String message;
-            if (type.equals("add")) {
-                message = portfolioData.addFav(stockName);
-            } else if (type.equals("remove")) {
-                message = portfolioData.removeFav(stockName);
-            } else {
-                message = "Invalid mode. Available Modes: add, remove";
+        @Command(name = "add")
+        public static class Add implements Runnable {
+            @Parameters(index = "0")
+            String stockName;
+
+            @Override
+            public void run() {
+                String message = portfolioData.addFav(stockName);
+
+                System.out.println(message);
             }
+        }
 
-            System.out.println(message);
+        @Command(name = "remove")
+        public static class Remove implements Runnable {
+            @Parameters(index = "0")
+            String stockName;
+
+            @Override
+            public void run() {
+                String message = portfolioData.removeFav(stockName);
+
+                System.out.println(message);
+            }
         }
     }
 }
