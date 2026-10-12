@@ -1,13 +1,16 @@
 package stockmarket;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class PortfolioData {
     private static Map<String, Holding> holdings = new TreeMap<>();
     private static double balance = 20000;
+    private static Set<String> favs = new LinkedHashSet<>();
 
     private static final DataService service = new DataService();
     private static List<Statement> statements = new ArrayList<>();
@@ -64,7 +67,6 @@ public class PortfolioData {
 
         if (holding.quantity == 0)
             holdings.remove(name);
-
 
         balance += total;
         addStatement(-quantity, total, name, StatementType.SELL, price);
@@ -125,5 +127,26 @@ public class PortfolioData {
         addStatement(amount, StatementType.WITHDRAW);
 
         return true;
+    }
+
+    public String addFav(String stockName) {
+
+        if (!service.isStock(stockName)) {
+            return "Stock: " + stockName.toUpperCase() + " Couldn't be found in service.";
+        } else if (favs.contains(stockName)) {
+            return "Stock: " + stockName.toUpperCase() + " is already in favorites";
+        }
+
+        favs.add(stockName);
+        return "Stock: " + stockName.toUpperCase() + " have been added to favorites.";
+    }
+
+    public String removeFav(String stockName) {
+
+        if (!favs.remove(stockName)) {
+            return "Stock: " + stockName.toUpperCase() + " is not in your favorites.";
+        }
+
+        return "Stock: " + stockName.toUpperCase() + " successfully removed from favorites.";
     }
 }

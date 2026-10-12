@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
         Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class,
-        Portfolio.Trade.class })
+        Portfolio.Trade.class, Portfolio.Favorite.class })
 public class Portfolio implements Runnable {
 
     private static final DataService service = new DataService();
@@ -321,6 +321,28 @@ public class Portfolio implements Runnable {
                 System.out.println("Failed to withdraw. Reason: Insufficient Balance. Current Balance: "
                         + portfolioData.getBalance());
             }
+        }
+    }
+
+    @Command(name = "fav")
+    public static class Favorite implements Runnable {
+        @Parameters(index = "0")
+        String type;
+        @Parameters(index = "1")
+        String stockName;
+
+        @Override
+        public void run() {
+            String message;
+            if (type.equals("add")) {
+                message = portfolioData.addFav(stockName);
+            } else if (type.equals("remove")) {
+                message = portfolioData.removeFav(stockName);
+            } else {
+                message = "Invalid mode. Available Modes: add, remove";
+            }
+
+            System.out.println(message);
         }
     }
 }

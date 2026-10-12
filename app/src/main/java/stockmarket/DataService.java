@@ -27,6 +27,10 @@ public class DataService {
         return null;
     }
 
+    public boolean isStock(String stockName){
+        return data.containsKey(stockName);
+    }
+
     public List<Map.Entry<String, Data>> getAllStock() {
         List<Map.Entry<String, Data>> all = new ArrayList<>(data.entrySet());
 
