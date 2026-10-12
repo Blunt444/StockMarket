@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 @Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
-        Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class })
+        Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class, 
+        Portfolio.Trade.class })
 public class Portfolio implements Runnable {
 
     private static final DataService service = new DataService();
@@ -102,7 +103,7 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
-            if(amount <= 0){
+            if (amount <= 0) {
                 System.out.println("Amount must be more than 0.");
                 return;
             }
@@ -117,10 +118,12 @@ public class Portfolio implements Runnable {
 
                 if (statement.type == StatementType.BUY) {
                     System.out.println("Bought " + statement.quantity + " quantity of " + statement.stockName + " for $"
-                            + statement.transaction + " Price Per Share You Bought: $" + statement.pricePerShare + " at " + statement.time);
+                            + statement.transaction + " Price Per Share You Bought: $" + statement.pricePerShare
+                            + " at " + statement.time);
                 } else if (statement.type == StatementType.SELL) {
                     System.out.println("SOLD " + statement.quantity + " quantity of " + statement.stockName + " for $"
-                            + statement.transaction + " Price Per Share You Sold: $" + statement.pricePerShare + " at " + statement.time);
+                            + statement.transaction + " Price Per Share You Sold: $" + statement.pricePerShare + " at "
+                            + statement.time);
                 } else if (statement.type == StatementType.WITHDRAW) {
                     System.out.println("Withdrew $" + statement.transaction + " at " + statement.time);
                 } else if (statement.type == StatementType.DEPOSIT) {
@@ -145,11 +148,11 @@ public class Portfolio implements Runnable {
             List<Statement> all = portfolioData.getTrade();
             boolean again = false;
 
-            if(amount <= 0){
+            if (amount <= 0) {
                 System.out.println("Amount must be greater than 0.");
                 return;
             }
-            if(all.size() == 0){
+            if (all.size() == 0) {
                 System.out.println("You have no Trade yet.");
                 return;
             }
@@ -158,11 +161,36 @@ public class Portfolio implements Runnable {
 
                 int len = Math.min(offset + amount, all.size());
 
-                for(int i = offset; i < len; i++){
+                for (int i = offset; i < len; i++) {
                     Statement statement = all.get(i);
 
-                    System.out.println("Stock Name: " + statement.stockName);
+                    System.out.println("Stock Name: " + statement.stockName.toUpperCase() + " ,Type: " + statement.type + " , Amount: $" + 
+                    statement.transaction + " ,Quantity: " + statement.quantity + " ,Price: $" + statement.pricePerShare + " at " + statement.time);
                 }
+
+                offset = len;
+                if(offset >= all.size()){
+                    System.out.println("All trades have been listed.");
+                    break;
+                }
+
+                System.out.print("Do you want to continue(y/n): ");
+                String confirmation = App.sc.nextLine().trim().toLowerCase();
+
+                if (confirmation.equals("y") || confirmation.equals("yes")) {
+                    again = true;
+                    System.out.print("How many more? ");
+                    amount = App.sc.nextInt();
+
+                    if (amount <= 0) {
+                        System.out.println("Amount must be greater than 0.");
+                        break;
+                    }
+                } else {
+                    System.out.println("Quiting Listing...");
+                    break;
+                }
+
 
             } while (again);
         }
@@ -179,11 +207,11 @@ public class Portfolio implements Runnable {
             int offset = 0;
             boolean again = false;
 
-            if(amount <= 0){
+            if (amount <= 0) {
                 System.out.println("Amount must be greater than 0.");
                 return;
             }
-            if(all.size() == 0){
+            if (all.size() == 0) {
                 System.out.println("You have no holdings yet.");
                 return;
             }
@@ -196,13 +224,12 @@ public class Portfolio implements Runnable {
                     String stockName = all.get(i).getKey();
                     Holding holding = all.get(i).getValue();
 
-                    System.out.println("Stock: " + stockName + 
+                    System.out.println("Stock: " + stockName +
                             " ,Quantity: " + holding.quantity +
                             " ,Total Invested: $" + holding.amount +
-                            " ,Avg Buy Price: $" + holding.pricePerShare + 
-                            " ,Current Pice: $" + service.getPrice(stockName) + 
-                            " ,Diff: $" + (service.getPrice(stockName) - holding.pricePerShare)
-                        );
+                            " ,Avg Buy Price: $" + holding.pricePerShare +
+                            " ,Current Pice: $" + service.getPrice(stockName) +
+                            " ,Diff: $" + (service.getPrice(stockName) - holding.pricePerShare));
                 }
 
                 offset = len;
@@ -243,7 +270,7 @@ public class Portfolio implements Runnable {
         @Override
         public void run() {
 
-            if(amount <= 0){
+            if (amount <= 0) {
                 System.out.println("Amount must be greater than 0.");
                 return;
             }
@@ -266,7 +293,7 @@ public class Portfolio implements Runnable {
         @Override
         public void run() {
 
-            if(amount <= 0){
+            if (amount <= 0) {
                 System.out.println("Amount must be greater than 0.");
                 return;
             }
