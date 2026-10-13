@@ -15,6 +15,10 @@ public class PortfolioData {
     private static final DataService service = new DataService();
     private static List<Statement> statements = new ArrayList<>();
 
+    PortfolioData(){
+        load();
+    }
+
     public List<Map.Entry<String, Holding>> getHoldings() {
 
         List<Map.Entry<String, Holding>> all = new ArrayList<>(holdings.entrySet());
@@ -148,5 +152,25 @@ public class PortfolioData {
         }
 
         return "Stock: " + stockName.toUpperCase() + " successfully removed from favorites.";
+    }
+
+    private void load() {
+        Storage.SaveData d = Storage.load();
+        balance = d.balance;
+
+        holdings = new TreeMap<>(d.holdings);
+        statements = new ArrayList<>(d.statements);
+        favs.addAll(d.favs);
+    }
+
+    private void save() {
+        Storage.SaveData d = new Storage.SaveData();
+
+        d.balance = balance;
+        d.holdings = new TreeMap<>(holdings);
+        d.statements = new ArrayList<>(statements);
+        d.favs.addAll(favs);
+
+        Storage.save(d);
     }
 }
