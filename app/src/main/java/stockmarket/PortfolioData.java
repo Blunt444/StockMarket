@@ -85,11 +85,13 @@ public class PortfolioData {
             double pricePerShare) {
         Statement statement = new Statement(quantity, transaction, stockName, type, pricePerShare);
         statements.add(statement);
+        save();
     }
 
     public void addStatement(double transaction, StatementType type) {
         Statement statement = new Statement(transaction, type);
         statements.add(statement);
+        save();
     }
 
     public List<Statement> getStatements(int amount) {
@@ -142,6 +144,7 @@ public class PortfolioData {
         }
 
         favs.add(stockName);
+        save();
         return "Stock: " + stockName.toUpperCase() + " have been added to favorites.";
     }
 
@@ -151,7 +154,12 @@ public class PortfolioData {
             return "Stock: " + stockName.toUpperCase() + " is not in your favorites.";
         }
 
+        save();
         return "Stock: " + stockName.toUpperCase() + " successfully removed from favorites.";
+    }
+
+    public Set<String> getFavs(){
+        return new LinkedHashSet<>(favs);
     }
 
     private void load() {

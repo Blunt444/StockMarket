@@ -6,6 +6,7 @@ import picocli.CommandLine.Parameters;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 @Command(name = "portfolio", subcommands = { Portfolio.Buy.class, Portfolio.Sell.class, Portfolio.Balance.class,
         Portfolio.Transaction.class, Portfolio.ListHolding.class, Portfolio.Deposit.class, Portfolio.Withdraw.class,
@@ -191,12 +192,13 @@ public class Portfolio implements Runnable {
                             break;
                         }
                     } catch (InputMismatchException e) {
+                        App.sc.nextLine();
                         System.out.println("Invalid Input. Quiting Listing");
                         break;
                     }
 
                 } else {
-                    System.out.println("Quiting Listing...");
+                    System.out.println("Quitting Listing...");
                     break;
                 }
 
@@ -263,11 +265,12 @@ public class Portfolio implements Runnable {
                             break;
                         }
                     } catch (InputMismatchException e) {
+                        App.sc.nextLine();
                         System.out.println("Invalid Input. Quiting Listing.");
                         break;
                     }
                 } else {
-                    System.out.println("Quiting the listing...");
+                    System.out.println("Quitting the listing...");
                     break;
                 }
 
@@ -324,7 +327,7 @@ public class Portfolio implements Runnable {
         }
     }
 
-    @Command(name = "fav", subcommands = { Favorite.Add.class, Favorite.Remove.class})
+    @Command(name = "fav", subcommands = { Favorite.Add.class, Favorite.Remove.class, Favorite.ListFavs.class })
     public static class Favorite {
 
         @Command(name = "add")
@@ -350,6 +353,73 @@ public class Portfolio implements Runnable {
                 String message = portfolioData.removeFav(stockName);
 
                 System.out.println(message);
+            }
+        }
+
+        @Command(name = "list")
+        public static class ListFavs implements Runnable {
+            @Parameters(index = "0", arity = "0..1", defaultValue = "10")
+            int amount;
+
+            @Override
+            public void run() {
+                List<String> favs = new ArrayList<>(portfolioData.getFavs());
+                boolean again = false;
+                int offset = 0;
+
+                if (amount <= 0) {
+                    System.out.println("Amount must be greater than 0.");
+                    return;
+                } else if (favs.size() == 0) {
+                    System.out.println("There are no favorites currently. Add any stock.");
+                    return;
+                }
+
+                System.out.println("Your Favorite stocks: ");
+
+                do {
+
+                    int len = Math.min(offset + amount, favs.size());
+
+                    for (int i = offset; i < len; i++) {
+                        String stockName = favs.get(i);
+
+                        System.out.println("Stock: " + stockName.toUpperCase());
+                    }
+
+                    offset = len;
+
+                    if (offset >= favs.size()) {
+                        System.out.println("All favorites have been listed");
+                        break;
+                    }
+
+                    System.out.print("Do you want to continue(y/n): ");
+
+                    String confirmation = App.sc.nextLine().trim().toLowerCase();
+
+                    if (confirmation.equals("y") || confirmation.equals("yes")) {
+                        again = true;
+                        System.out.print("How many more? ");
+                        try {
+                            amount = App.sc.nextInt();
+                            App.sc.nextLine();
+
+                            if (amount <= 0) {
+                                System.out.println("Amount must be greater than 0.");
+                                break;
+                            }
+                        } catch (InputMismatchException e) {
+                            App.sc.nextLine();
+                            System.out.println("Not a valid input. Must be greater than 0.");
+                            break;
+                        }
+                    } else {
+                        System.out.println("Quitting Listing...");
+                        break;
+                    }
+
+                } while (again);
             }
         }
     }
