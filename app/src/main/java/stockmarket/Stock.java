@@ -3,10 +3,11 @@ package stockmarket;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 
-@Command(name = "stock", subcommands = { Stock.Info.class, Stock.ListStock.class })
+@Command(name = "stock", subcommands = { Stock.Info.class, Stock.ListStock.class, Stock.Compare.class })
 public class Stock {
 
     private static final DataService service = new DataService();
@@ -65,11 +66,17 @@ public class Stock {
                 if (confirmation.equals("yes") || confirmation.equals("y")) {
                     again = true;
                     System.out.print("\nHow many more: ");
-                    amount = App.sc.nextInt();
-                    System.out.print("\n");
+                    try {
+                        amount = App.sc.nextInt();
+                        App.sc.nextLine();
 
-                    if (amount < 0) {
-                        System.out.println("Invalid Input. Input must be more than 0.");
+                        if (amount <= 0) {
+                            System.out.println("Invalid Input. Input must be greater than 0.");
+                            break;
+                        }
+                    } catch (InputMismatchException e) {
+                        App.sc.nextLine();
+                        System.out.println("Not a valid input. Must be greater than 0.");
                         break;
                     }
                 } else {
@@ -80,6 +87,33 @@ public class Stock {
                 offset = len;
 
             } while (again);
+        }
+    }
+
+    @Command(name = "compare")
+    public static class Compare implements Runnable {
+
+        @Parameters(index = "0")
+        public String stock1;
+        @Parameters(index = "1")
+        public String stock2;
+
+        @Override
+        public void run() {
+            Data stock1Data = service.getStock(stock1);
+            Data stock2Data = service.getStock(stock2);
+
+            if(stock1Data == null){
+                System.out.println("Stock: " + stock1.toUpperCase() + " couldn't be found in service.");
+                return;
+            }
+            else if(stock2Data == null){
+                System.out.println("Stock: " + stock1.toUpperCase() + " couldn't be found in service.");
+                return;
+            }
+
+            
+
         }
     }
 }

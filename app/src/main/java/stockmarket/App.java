@@ -5,9 +5,11 @@ import picocli.CommandLine.Command;
 
 import java.util.Scanner;
 
-@Command(name = "stockmarket", description = "A stock market CLI", subcommands = { Price.class, Portfolio.class, Stock.class })
+@Command(name = "stockmarket", description = "A stock market CLI", subcommands = { Price.class, Portfolio.class,
+        Stock.class })
 public class App implements Runnable {
     static final Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
         // int exitCode = new CommandLine(new App()).execute(args);
         // System.exit(exitCode);
@@ -19,9 +21,17 @@ public class App implements Runnable {
             return 2;
         });
 
+        System.out.println("Key Couldn't be found.");
+        System.out.println("Get a free key at https://finnhub.io/register (it's on the dashboard).");
+        System.out.print("Enter the api key: ");
+
+        String key = sc.nextLine().trim().split("\\s+")[0];
+        DataService.init(key);
 
         while (true) {
-            System.out.print("StockMarket> ");
+            DataService.authenticateKey();
+            DataService.callApiKey();
+            System.out.print("\nStockMarket> ");
 
             String line = sc.nextLine().trim().toLowerCase();
 
