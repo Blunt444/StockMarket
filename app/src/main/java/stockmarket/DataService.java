@@ -1,7 +1,5 @@
 package stockmarket;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -11,38 +9,106 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
 import java.util.TreeMap;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.List;
 import java.util.ArrayList;
 
 public class DataService {
 
-    // private static final Path envPath = Path.of(System.getProperty("user.home"),
-    // ".stockMarket");
-    private static final String keyName = "FINNHUB_KEY";
     private static String apiKey;
     private static long lastCheck = 0;
     private static final long maxPingTime = 5 * 60 * 1000;
-    private static long lastCached = 0;
-    private static long maxTime = 2 * 60 * 1000;
+    private static final long maxPriceTime = 3 * 60 * 1000;
 
     private static final Map<String, Data> data = new TreeMap<>();
 
     public Double getPrice(String name) {
-        Data val = data.get(name.toLowerCase());
+        Data val = data.get(name);
 
         if (val == null)
             return null;
 
+        long now = System.currentTimeMillis();
+
+        if (val.price == 0 || now - val.lastChecked > maxPriceTime) {
+            val.price = fetchPrice(name);
+            val.lastChecked = now;
+        }
+
         return val.price;
     }
 
+    private static double fetchPrice(String stockName) {
+        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(5)).build();
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("https://finnhub.io/api/v1/quote?symbol=" + stockName.toUpperCase()))
+                .header("X-Finnhub-Token", apiKey)
+                .timeout(Duration.ofSeconds(10)).GET().build();
+
+        try {
+            HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+            String body = res.body();
+
+            int status = res.statusCode();
+
+            if (status == 200) {
+                // System.out.println(res.body());
+                JsonObject obj = JsonParser.parseString(body).getAsJsonObject();
+                double price = obj.get("c").getAsDouble();
+
+                if (price <= 0) {
+                    throw new IllegalStateException("No price available for " + stockName.toUpperCase());
+                }
+
+                return price;
+            }
+
+            if (status == 401) {
+                System.out.println("API key rejected by Finnhub.");
+                System.exit(0);
+            }
+
+            if (status == 429) {
+                // System.out.println("Finnhub rate limit reached. Slow down for a minute.");
+                throw new IllegalStateException("Rate limit reached. Can't process this at the moment");
+            }
+
+            if (status == 403) {
+                System.out.println("Your Finnhub plan doesn't allow this request. Exiting.");
+                System.exit(0);
+            }
+
+            if (status == 422) {
+                System.out.println("Finnhub couldn't process the request (status 422). Exiting.");
+                System.exit(0);
+            }
+            if (status >= 500) {
+                System.out.println("Finnhub is having problems (status" + status + "). Exiting.");
+                System.exit(0);
+            }
+
+        } catch (InterruptedException e) {
+            System.out.println("No connection");
+            System.exit(0);
+        } catch (IOException e) {
+            System.out.println("No connection");
+            System.exit(0);
+        }
+
+        throw new IllegalStateException("Unexpected response from Finnhub");
+    }
+
     public static void callApiKey() {
-        long now = System.currentTimeMillis();
-        if (now - lastCached < maxTime)
+        if (!data.isEmpty())
             return;
 
         try {
-
             System.out.println("Caching data... Please wait few minutes");
 
             HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS)
@@ -50,7 +116,7 @@ public class DataService {
             HttpRequest req = HttpRequest.newBuilder()
                     .uri(URI.create("https://finnhub.io/api/v1/stock/symbol?exchange=US"))
                     .header("X-Finnhub-Token", apiKey)
-                    .timeout(Duration.ofSeconds(5))
+                    .timeout(Duration.ofSeconds(30))
                     .GET()
                     .build();
 
@@ -59,49 +125,57 @@ public class DataService {
             int status = res.statusCode();
 
             if (status == 200) {
-                lastCached = now;
-                System.out.println(res.body());
-                setData();
+                JsonArray arr = JsonParser.parseString(res.body()).getAsJsonArray();
+                setData(arr);
             }
 
             if (status == 401) {
                 System.out.println("API key rejected by Finnhub.");
-                System.exit(1);
+                System.exit(0);
             }
 
             if (status == 429) {
                 System.out.println("Finnhub rate limit reached. Slow down for a minute.");
-                lastCached = now;
             }
 
             if (status == 403) {
                 System.out.println("Your Finnhub plan doesn't allow this request. Exiting.");
-                System.exit(1);
+                System.exit(0);
             }
 
             if (status == 422) {
                 System.out.println("Finnhub couldn't process the request (status 422). Exiting.");
-                System.exit(1);
+                System.exit(0);
             }
             if (status >= 500) {
                 System.out.println("Finnhub is having problems (status" + status + "). Exiting.");
-                System.exit(1);
+                System.exit(0);
             }
 
         } catch (InterruptedException e) {
             System.out.print("No connection");
-            System.exit(1);
+            System.exit(0);
         } catch (IllegalArgumentException e) {
             System.out.print("API key rejected by FINNHUB.");
-            System.exit(1);
+            System.exit(0);
         } catch (IOException e) {
             System.out.print("No connection.");
-            System.exit(1);
+            System.exit(0);
         }
     }
 
-    public static void setData() {
+    public static void setData(JsonArray arr) {
+        for (JsonElement e : arr) {
+            JsonObject obj = e.getAsJsonObject();
 
+            String symbol = obj.get("symbol").getAsString().toLowerCase();
+            if (symbol.isBlank() || symbol.isEmpty())
+                continue;
+            // String
+
+            Data temp = new Data(symbol, 0, System.currentTimeMillis());
+            data.put(symbol, temp);
+        }
     }
 
     public static void authenticateKey() {
@@ -112,7 +186,7 @@ public class DataService {
 
         if (apiKey == null) {
             System.out.print("API key is null. Please enter a good api key next time. \n");
-            System.exit(1);
+            System.exit(0);
         }
 
         try {
@@ -132,7 +206,7 @@ public class DataService {
 
             if (status == 401) {
                 System.out.println("API key rejected by Finnhub.");
-                System.exit(1);
+                System.exit(0);
             }
 
             if (status == 429) {
@@ -142,27 +216,27 @@ public class DataService {
 
             if (status == 403) {
                 System.out.println("Your Finnhub plan doesn't allow this request. Exiting.");
-                System.exit(1);
+                System.exit(0);
             }
 
             if (status == 422) {
                 System.out.println("Finnhub couldn't process the request (status 422). Exiting.");
-                System.exit(1);
+                System.exit(0);
             }
             if (status >= 500) {
                 System.out.println("Finnhub is having problems (status" + status + "). Exiting.");
-                System.exit(1);
+                System.exit(0);
             }
 
         } catch (InterruptedException e) {
             System.out.println("No connection");
-            System.exit(1);
+            System.exit(0);
         } catch (IllegalArgumentException e) {
             System.out.println("API key rejected by FINNHUB.");
-            System.exit(1);
+            System.exit(0);
         } catch (IOException e) {
             System.out.println("No connection.");
-            System.exit(1);
+            System.exit(0);
         }
     }
 

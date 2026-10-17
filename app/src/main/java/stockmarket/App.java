@@ -11,8 +11,6 @@ public class App implements Runnable {
     static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // int exitCode = new CommandLine(new App()).execute(args);
-        // System.exit(exitCode);
 
         CommandLine cmd = new CommandLine(new App());
 
@@ -21,7 +19,6 @@ public class App implements Runnable {
             return 2;
         });
 
-        System.out.println("Key Couldn't be found.");
         System.out.println("Get a free key at https://finnhub.io/register (it's on the dashboard).");
         System.out.print("Enter the api key: ");
 

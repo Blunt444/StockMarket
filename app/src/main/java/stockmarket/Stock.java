@@ -27,7 +27,12 @@ public class Stock {
                 return;
             }
 
-            System.out.println("Stock Name: " + stockName.toUpperCase() + " ,Price: $" + data.price);
+            try {
+                double price = service.getPrice(stockName);
+                System.out.println("Stock Name: " + stockName.toUpperCase() + " ,Price: $" + price);
+            } catch (IllegalStateException e) {
+                System.out.println("Couldn't verify the stock price");
+            }
         }
     }
 
@@ -45,13 +50,22 @@ public class Stock {
             do {
 
                 int len = Math.min(offset + amount, all.size());
+                int skipped = 0;
 
                 for (int i = offset; i < len; i++) {
                     Map.Entry<String, Data> entry = all.get(i);
                     String key = entry.getKey();
-                    Data value = entry.getValue();
 
-                    System.out.println("Stock Name: " + key.toUpperCase() + " ,Price: $" + value.price);
+                    try {
+                        double price = service.getPrice(key);
+                        System.out.println("Stock Name: " + key.toUpperCase() + " ,Price: $" + price);
+                    } catch (IllegalStateException e) {
+                        skipped++;
+                    }
+                }
+
+                if (skipped > 0) {
+                    System.out.println("Skipped: " + skipped + " stocks.");
                 }
 
                 if (len >= all.size()) {
@@ -103,16 +117,43 @@ public class Stock {
             Data stock1Data = service.getStock(stock1);
             Data stock2Data = service.getStock(stock2);
 
-            if(stock1Data == null){
+            if (stock1Data == null) {
+                System.out.println("Stock: " + stock1.toUpperCase() + " couldn't be found in service.");
+                return;
+            } else if (stock2Data == null) {
                 System.out.println("Stock: " + stock1.toUpperCase() + " couldn't be found in service.");
                 return;
             }
-            else if(stock2Data == null){
-                System.out.println("Stock: " + stock1.toUpperCase() + " couldn't be found in service.");
+            Double price1 = null;
+            Double price2 = null;
+            try {
+                price1 = service.getPrice(stock1);
+            } catch (IllegalStateException e) {
+                System.out.println("Couldn't verify price for Stock: " + stock1.toUpperCase());
+                return;
+            }
+            try {
+                price2 = service.getPrice(stock2);
+            } catch (IllegalStateException e) {
+                System.out.println("Couldn't verify price for Stock: " + stock2.toUpperCase());
                 return;
             }
 
-            
+            double diff = price1 - price2;
+            double percent = (diff / price2) * 100;
+
+            System.out.printf("%-8s $%.2f%n", stock1.toUpperCase(), price1);
+            System.out.printf("%-8s $%.2f%n", stock2.toUpperCase(), price2);
+
+            if (diff == 0) {
+                System.out.println("Both are priced the same.");
+            } else if (diff > 0) {
+                System.out.printf("%s is $%.2f higher than %s (%+.2f%%)%n",
+                        stock1.toUpperCase(), diff, stock2.toUpperCase(), percent);
+            } else {
+                System.out.printf("%s is $%.2f higher than %s (%+.2f%%)%n",
+                        stock2.toUpperCase(), -diff, stock1.toUpperCase(), -(diff / price1) * 100);
+            }
 
         }
     }

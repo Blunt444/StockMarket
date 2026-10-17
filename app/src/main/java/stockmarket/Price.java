@@ -20,6 +20,6 @@ public class Price implements Runnable{
             return;
         }
         
-        System.out.printf("%.2f\n", price);
+        System.out.printf("$%.2f\n", price);
     } 
 }
