@@ -19,6 +19,11 @@ public class App implements Runnable {
             return 2;
         });
 
+        cmd.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
+            System.out.println(ex.getMessage());
+            return 1;
+        });
+
         System.out.println("Get a free key at https://finnhub.io/register (it's on the dashboard).");
         System.out.print("Enter the api key: ");
 

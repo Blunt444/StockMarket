@@ -81,6 +81,8 @@ public class DataService {
                 d.change = getValue(obj, "d", stockName);
                 d.dp = getValue(obj, "dp", stockName);
                 d.pc = getValue(obj, "pc", stockName);
+
+                return;
             }
 
             if (status == 401) {
