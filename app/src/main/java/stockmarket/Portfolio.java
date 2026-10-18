@@ -234,12 +234,16 @@ public class Portfolio implements Runnable {
                     String stockName = all.get(i).getKey();
                     Holding holding = all.get(i).getValue();
 
-                    System.out.println("Stock: " + stockName +
-                            " ,Quantity: " + holding.quantity +
-                            " ,Total Invested: $" + holding.amount +
-                            " ,Avg Buy Price: $" + holding.pricePerShare +
-                            " ,Current Pice: $" + service.getPrice(stockName) +
-                            " ,Diff: $" + (service.getPrice(stockName) - holding.pricePerShare));
+                    try {
+                        System.out.println("Stock: " + stockName +
+                                " ,Quantity: " + holding.quantity +
+                                " ,Total Invested: $" + holding.amount +
+                                " ,Avg Buy Price: $" + holding.pricePerShare +
+                                " ,Current Pice: $" + service.getPrice(stockName) +
+                                " ,Diff: $" + (service.getPrice(stockName) - holding.pricePerShare));
+                    } catch (IllegalStateException e) {
+                        System.out.println("Couldn't fetch price from API. Stock: " + stockName);
+                    }
                 }
 
                 offset = len;

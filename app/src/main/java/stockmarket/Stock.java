@@ -28,8 +28,14 @@ public class Stock {
             }
 
             try {
-                double price = service.getPrice(stockName);
-                System.out.println("Stock Name: " + stockName.toUpperCase() + " ,Price: $" + price);
+                service.getPrice(stockName);
+                System.out.printf("Stock:          %s%n", stockName.toUpperCase());
+                System.out.printf("Price:          $%.2f%n", data.price);
+                System.out.printf("Change:         %+.2f (%+.2f%%)%n", data.change, data.dp);
+                System.out.printf("Open:           $%.2f%n", data.open);
+                System.out.printf("High:           $%.2f%n", data.high);
+                System.out.printf("Low:            $%.2f%n", data.low);
+                System.out.printf("Prev. close:    $%.2f%n", data.pc);
             } catch (IllegalStateException e) {
                 System.out.println("Couldn't verify the stock price");
             }
@@ -55,10 +61,17 @@ public class Stock {
                 for (int i = offset; i < len; i++) {
                     Map.Entry<String, Data> entry = all.get(i);
                     String key = entry.getKey();
-
+                    Data data = entry.getValue();
                     try {
-                        double price = service.getPrice(key);
-                        System.out.println("Stock Name: " + key.toUpperCase() + " ,Price: $" + price);
+                        service.getPrice(key);
+                        System.out.printf("Stock:          %s%n", key.toUpperCase());
+                        System.out.printf("Price:          $%.2f%n", data.price);
+                        System.out.printf("Change:         %+.2f (%+.2f%%)%n", data.change, data.dp);
+                        System.out.printf("Open:           $%.2f%n", data.open);
+                        System.out.printf("High:           $%.2f%n", data.high);
+                        System.out.printf("Low:            $%.2f%n", data.low);
+                        System.out.printf("Prev. close:    $%.2f%n", data.pc);
+                        System.out.printf("------------------------------%n");
                     } catch (IllegalStateException e) {
                         skipped++;
                     }

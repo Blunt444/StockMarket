@@ -36,14 +36,22 @@ public class DataService {
         long now = System.currentTimeMillis();
 
         if (val.price == 0 || now - val.lastChecked > maxPriceTime) {
-            val.price = fetchPrice(name);
+            fetchPrice(name, val);
             val.lastChecked = now;
         }
 
         return val.price;
     }
 
-    private static double fetchPrice(String stockName) {
+    private static double getValue(JsonObject o, String key, String stockName) {
+        try {
+            return o.get(key).getAsDouble();
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("No price data available for " + stockName.toUpperCase(), e);
+        }
+    }
+
+    private static void fetchPrice(String stockName, Data d) {
         HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(5)).build();
         HttpRequest req = HttpRequest.newBuilder()
@@ -60,13 +68,19 @@ public class DataService {
             if (status == 200) {
                 // System.out.println(res.body());
                 JsonObject obj = JsonParser.parseString(body).getAsJsonObject();
-                double price = obj.get("c").getAsDouble();
+                double price = getValue(obj, "c", stockName);
 
                 if (price <= 0) {
                     throw new IllegalStateException("No price available for " + stockName.toUpperCase());
                 }
 
-                return price;
+                d.price = price;
+                d.open = getValue(obj, "o", stockName);
+                d.high = getValue(obj, "h", stockName);
+                d.low = getValue(obj, "l", stockName);
+                d.change = getValue(obj, "d", stockName);
+                d.dp = getValue(obj, "dp", stockName);
+                d.pc = getValue(obj, "pc", stockName);
             }
 
             if (status == 401) {
@@ -100,8 +114,6 @@ public class DataService {
             System.out.println("No connection");
             System.exit(0);
         }
-
-        throw new IllegalStateException("Unexpected response from Finnhub");
     }
 
     public static void callApiKey() {
@@ -173,7 +185,7 @@ public class DataService {
                 continue;
             // String
 
-            Data temp = new Data(symbol, 0, System.currentTimeMillis());
+            Data temp = new Data(symbol, 0, 0, 0, 0, 0, 0, 0, System.currentTimeMillis());
             data.put(symbol, temp);
         }
     }
