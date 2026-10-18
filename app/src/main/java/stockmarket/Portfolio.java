@@ -31,6 +31,11 @@ public class Portfolio implements Runnable {
 
         @Override
         public void run() {
+
+            if (quantity < 0) {
+                System.out.println("Quantity must be greater than 0.");
+            }
+
             System.out.print("Do you want to proceed this action(Y/N): ");
 
             String confirmation = App.sc.nextLine().trim().toLowerCase();
@@ -43,13 +48,6 @@ public class Portfolio implements Runnable {
             } else {
                 System.out.println("Cancelled the action.");
             }
-
-            // if (isUpdated) {
-            // System.out.println("Successfully bought " + quantity + " shares of " + name);
-            // } else {
-            // System.out.println("Failed to buy " + quantity + " shares of " + name);
-            // }
-
         }
 
     }
@@ -64,6 +62,10 @@ public class Portfolio implements Runnable {
         @Override
         public void run() {
 
+            if (quantity < 0) {
+                System.out.println("Quantity must be greater than 0.");
+            }
+
             System.out.print("Do you want to proceed this action(Y/N): ");
 
             String confirmation = App.sc.nextLine().trim().toLowerCase();
@@ -76,12 +78,6 @@ public class Portfolio implements Runnable {
             } else {
                 System.out.println("Cancelled the action.");
             }
-            // if (isUpdated) {
-            // System.out.println("Successfully sold " + quantity + " shares of " + name);
-            // } else {
-            // System.out.println("Failed to sell " + quantity + " shares of " + name);
-            // }
-
         }
     }
 

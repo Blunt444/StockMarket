@@ -114,6 +114,8 @@ public class DataService {
             System.out.println("No connection");
             System.exit(0);
         }
+
+        throw new IllegalStateException("Unexpected response from Finnhub");
     }
 
     public static void callApiKey() {
@@ -121,7 +123,7 @@ public class DataService {
             return;
 
         try {
-            System.out.println("Caching data... Please wait few minutes");
+            System.out.println("Loading Symbols from the API... Please wait for a few minutes");
 
             HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS)
                     .connectTimeout(Duration.ofSeconds(5)).build();

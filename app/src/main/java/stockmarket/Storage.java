@@ -39,8 +39,11 @@ public class Storage {
     }
 
     public static SaveData load() {
-        if (!Files.exists(file))
-            return new SaveData();
+        if (!Files.exists(file)) {
+            SaveData d = new SaveData();
+            d.balance = 2000;
+            return d;
+        }
 
         try {
             SaveData d = gson.fromJson(Files.readString(file), SaveData.class);
