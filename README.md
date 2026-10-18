@@ -18,6 +18,9 @@ StockMarket is a CLI based application. It uses **FINNHUB** api key to fetch sto
 
 The free plan allows 60 API calls per minute.
 
+# Project in action
+![Stock market CLI demo](images/demo.png)
+
 # How to run it
 
 1. Visit this page https://github.com/Blunt444/StockMarket/releases/tag/v0.0.1 and download the latest zip file.
