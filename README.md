@@ -2,6 +2,8 @@
 
 StockMarket is a CLI based application. It uses **FINNHUB** api key to fetch stock names and displays the data. It uses java with [picocli](https://picocli.info) to run the application.
 
+*Note*: The demo is only available for windows. The code is cross-platform.
+
 ## Requirements
 
 - **Windows release (`.exe`):** nothing, Java is bundled.
@@ -25,8 +27,14 @@ The free plan allows 60 API calls per minute.
 # How to run the code
 
 1. Pull the latest commit from this link https://github.com/Blunt444/StockMarket.git
-2. Open the terminal ctrl + backtick(windows)
+2. Open the terminal ctrl + ` (windows)
 3. Run this command
+
+(Windows)
+```bash
+.\gradlew.bat --console=plain -q run
+```
+(Linux/Macos)
 ```bash
 ./gradlew --console=plain -q run
 ```
