@@ -156,3 +156,7 @@ exit
 ## Where your data is saved
 
 Your balance, holdings, transactions and favorites are saved to `~/.stockmarket/data.json` (on Windows: `C:\Users\<you>\.stockmarket\data.json`). Delete that file to reset everything.
+
+
+##License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file.
